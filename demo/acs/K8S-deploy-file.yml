@@ -1,0 +1,100 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: drupal-deployment
+spec:
+  replicas: 1 # tells deployment to run x pods matching the template
+  template: # create pods using pod definition in this template
+    metadata:
+      labels:
+        app: drupal-app
+    spec:
+      containers:
+      - name: drupal
+        image: drupal
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /var/www/html/modules
+          name: drupal-modules
+        - mountPath: /var/www/html/profiles
+          name: drupal-profiles
+        - mountPath: /var/www/html/sites
+          name: drupal-sites
+        - mountPath: /var/www/html/themes
+          name: drupal-themes
+      volumes:
+        - name: drupal-modules
+          azureFile:
+            secretName: azurefile-drupal-secret
+            shareName: drupal-modules
+            readOnly: false
+        - name: drupal-profiles
+          azureFile:
+            secretName: azurefile-drupal-secret
+            shareName: drupal-profiles
+            readOnly: false
+        - name: drupal-sites
+          azureFile:
+            secretName: azurefile-drupal-secret
+            shareName: drupal-sites
+            readOnly: false
+        - name: drupal-themes
+          azureFile:
+            secretName: azurefile-drupal-secret
+            shareName: drupal-themes
+            readOnly: false
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mysqlsvc-deployment
+spec:
+  replicas: 1 # tells deployment to run x pods matching the template
+  template: # create pods using pod definition in this template
+    metadata:
+      labels:
+        app: mysqlsvc-app
+    spec:
+      containers:
+      - name: mysqlsvc
+        image: mysql
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - mountPath: /var/lib/mysql 
+          name: mysql-home
+        args:
+          - "--ignore-db-dir"
+          - "lost+found"
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            # change this
+            value: pass@word1
+      volumes:
+      - name: mysql-home
+        persistentVolumeClaim:
+          claimName: mysql-pv
+
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: slow
+provisioner: kubernetes.io/azure-disk
+parameters:
+  skuName: Standard_LRS
+---
+apiVersion: "v1"
+kind: "PersistentVolumeClaim"
+metadata:
+  name: "mysql-pv"
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "slow"
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "10Gi"
