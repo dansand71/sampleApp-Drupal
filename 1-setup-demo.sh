@@ -31,11 +31,12 @@ echo ".base64 encoding Storage Account name and Key"
 #tell kubernetes about the secret with base64 incoding
 B64STORAGENAME=`echo "VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore" | base64`
 B64STORAGEKEY=`~/bin/az storage account keys list -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-paas --query [1].value -o tsv | base64`
+echo ".base64 access key:${B64STORAGEKEY}"
 
 #SED the secret file
 echo ".replacing data in the K8S secrets file for deployment"
-sed -i -e "s|REPLACE-B64-STORAGEACCOUNTNAME|${B64STORAGENAME}|g" ../environment/K8S-az-storage-secret.yml
-sed -i -e "s|REPLACE-B64-STORAGEKEY|${B64STORAGEKEY}|g" ../environment/K8S-az-storage-secret.yml
+sed -i -e "s|REPLACE-B64-STORAGEACCOUNTNAME|${B64STORAGENAME}|g" ./environment/K8S-az-storage-secret.yml
+sed -i -e "s|REPLACE-B64-STORAGEKEY|${B64STORAGEKEY}|g" ./environment/K8S-az-storage-secret.yml
 
 echo ".deploying secret on K8S"
 kubectl create -f ./environment/K8S-az-storage-secret.yml
