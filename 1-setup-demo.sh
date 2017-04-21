@@ -27,6 +27,8 @@ echo ".creating shares"
 
 echo ".creating mount point"
 #Create Mount Point
+#delete the mount point if it exists
+sudo umount /mnt/drupal-sites
 ./environment/create-mount-point.sh
 echo ".copying assets into storage file shares for initial setup"
 #copy files into shares
