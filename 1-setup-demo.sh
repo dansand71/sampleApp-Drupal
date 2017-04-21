@@ -40,6 +40,9 @@ sed -i -e "s|REPLACE-B64-STORAGEACCOUNTNAME|${B64STORAGENAME}|g" ./environment/K
 sed -i -e "s|REPLACE-B64-STORAGEKEY|${B64STORAGEKEY}|g" ./environment/K8S-az-storage-secret.yml
 
 echo ".deploying secret on K8S"
+echo ".delete secret if it exists"
+kubectl delete secret azurefile-drupal-secret
+echo ".create secret"
 kubectl create -f ./environment/K8S-az-storage-secret.yml
 
 echo " ----------------------------"
