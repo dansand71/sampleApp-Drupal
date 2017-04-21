@@ -6,8 +6,9 @@ YELLOW="\033[38;5;11m"
 RED="\033[0;31m"
 
 echo -e "${BOLD}Create Drupal Storage Account?...${RESET}"
+DEFAULTSACCT="VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore"
 read -p "$(echo -e -n "${INPUT}.Storage Account Name to work with? (default: VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore) Must be lowercase:"${RESET})" storagePrefix
-[ -z "${storagePrefix}" ] && storagePrefix="VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore"
+[ -z "${storagePrefix}" ] && storagePrefix=${DEFAULTSACCT}
 storagePrefix=$(echo "${storagePrefix}" | tr '[:upper:]' '[:lower:]')
 echo ".working with ${storagePrefix} account name."
 read -p "$(echo -e -n "${INPUT}Create new Storage Account for Drupal Persistent Shares? [Y/n]:"${RESET})" continuescript
@@ -25,10 +26,15 @@ echo ".creating shares"
 ~/bin/az storage share create --name drupal-modules --connection-string "${STORAGECONN}" --quota 100
 ~/bin/az storage share create --name drupal-profiles --connection-string "${STORAGECONN}" --quota 100
 
+echo ".getting storage key"
+STORAGEKEY=`~/bin/az storage account keys list -n ${storagePrefix} -g ossdemo-appdev-acs --query [1].value -o tsv`
+
 echo ".creating mount point"
 #Create Mount Point
 #delete the mount point if it exists
 sudo umount /mnt/drupal-sites
+sed -i -e "s|REPLACEDRUPALSTORAGEACCOUNT|${storagePrefix}|g" ./environment/create-mount-point.sh
+sed -i -e "s|REPLACEDRUPALSTORAGEKEY|${STORAGEKEY}|g" ./environment/create-mount-point.sh
 ./environment/create-mount-point.sh
 echo ".copying assets into storage file shares for initial setup"
 #copy files into shares
@@ -39,7 +45,7 @@ echo ".base64 encoding Storage Account name and Key"
 #tell kubernetes about the secret with base64 incoding
 B64STORAGENAME=`echo "${storagePrefix}" | base64 --wrap=0`
 echo ".base64 storagename:${B64STORAGENAME}"
-B64STORAGEKEY=`~/bin/az storage account keys list -n ${storagePrefix} -g ossdemo-appdev-acs --query [1].value -o tsv | base64 --wrap=0`
+B64STORAGEKEY=`echo "${STORAGEKEY}" | base64 --wrap=0`
 echo ".base64 access key:${B64STORAGEKEY}"
 
 #SED the secret file
