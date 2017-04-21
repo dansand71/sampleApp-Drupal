@@ -14,11 +14,11 @@ echo ".working with ${storagePrefix} account name."
 read -p "$(echo -e -n "${INPUT}Create new Storage Account for Drupal Persistent Shares? [Y/n]:"${RESET})" continuescript
 # This requires a newer version of BASH not avialble in MAC OS - storagePrefix=${storagePrefix,,} 
 if [[ ${continuescript,,} != "n" ]]; then
-    ~/bin/az storage account create -n $storagePrefix -g ossdemo-appdev-acs -l eastus --sku Standard_LRS
+    ~/bin/az storage account create -n $storagePrefix -g ossdemo-appdev-paas -l eastus --sku Standard_LRS
 fi
 
 echo ".getting storage account connection string for ${storagePrefix}"
-STORAGECONN=`~/bin/az storage account show-connection-string -n ${storagePrefix} -g ossdemo-appdev-acs --query connectionString -o tsv`
+STORAGECONN=`~/bin/az storage account show-connection-string -n ${storagePrefix} -g ossdemo-appdev-paas --query connectionString -o tsv`
 echo ".found ${STORAGECONN}"
 echo ".creating shares"
 ~/bin/az storage share create --name drupal-sites --connection-string "${STORAGECONN}" --quota 100
@@ -27,7 +27,7 @@ echo ".creating shares"
 ~/bin/az storage share create --name drupal-profiles --connection-string "${STORAGECONN}" --quota 100
 
 echo ".getting storage key"
-STORAGEKEY=`~/bin/az storage account keys list -n ${storagePrefix} -g ossdemo-appdev-acs --query [1].value -o tsv`
+STORAGEKEY=`~/bin/az storage account keys list -n ${storagePrefix} -g ossdemo-appdev-paas --query [1].value -o tsv`
 
 echo ".creating mount point"
 #Create Mount Point
