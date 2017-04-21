@@ -8,7 +8,7 @@ RED="\033[0;31m"
 echo -e "${BOLD}Create Drupal Storage Account?...${RESET}"
 read -p "$(echo -e -n "${INPUT}Create new Storage Account for Drupal Persistent Shares? [Y/n]:"${RESET})" continuescript
 if [[ ${continuescript,,} != "n" ]]; then
-    ~/bin/az storage account create -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-paas -l eastus --sku Standard_LRS
+    ~/bin/az storage account create -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-acs -l eastus --sku Standard_LRS
 fi
 echo ".getting storage account connection string for VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore"
 STORAGECONN=`~/bin/az storage account show-connection-string -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-acs --query connectionString -o tsv`
@@ -31,7 +31,7 @@ echo ".base64 encoding Storage Account name and Key"
 #tell kubernetes about the secret with base64 incoding
 B64STORAGENAME=`echo "VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore" | base64 --wrap=0`
 echo ".base64 storagename:${B64STORAGENAME}"
-B64STORAGEKEY=`~/bin/az storage account keys list -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-paas --query [1].value -o tsv | base64 --wrap=0`
+B64STORAGEKEY=`~/bin/az storage account keys list -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-acs --query [1].value -o tsv | base64 --wrap=0`
 echo ".base64 access key:${B64STORAGEKEY}"
 
 #SED the secret file
