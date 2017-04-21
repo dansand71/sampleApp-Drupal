@@ -43,9 +43,9 @@ echo "-----------------------------"
 
 echo ".base64 encoding Storage Account name and Key"
 #tell kubernetes about the secret with base64 incoding
-B64STORAGENAME=`echo "${storagePrefix}" | base64 --wrap=0`
+B64STORAGENAME=`echo ${storagePrefix} | base64 --wrap=0`
 echo ".base64 storagename:${B64STORAGENAME}"
-B64STORAGEKEY=`echo "${STORAGEKEY}" | base64 --wrap=0`
+B64STORAGEKEY=`echo ${STORAGEKEY} | base64 --wrap=0`
 echo ".base64 access key:${B64STORAGEKEY}"
 
 #SED the secret file
@@ -61,4 +61,3 @@ kubectl create -f ./environment/K8S-az-storage-secret.yml
 
 echo " ----------------------------"
 echo ".complete"
-
