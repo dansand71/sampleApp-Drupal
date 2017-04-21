@@ -6,14 +6,16 @@ YELLOW="\033[38;5;11m"
 RED="\033[0;31m"
 
 echo -e "${BOLD}Create Drupal Storage Account?...${RESET}"
-read -p "$(echo -e -n "${INPUT}Create new Storage Account for Drupal Persistent Shares? [Y/n]:"${RESET})" continuescript
-read -p "$(echo -e -n "${INPUT}.Storage Name? (default: VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore) Must be lowercase:"${RESET})" storagePrefix
+read -p "$(echo -e -n "${INPUT}.Storage Account Name to work with? (default: VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore) Must be lowercase:"${RESET})" storagePrefix
 [ -z "${storagePrefix}" ] && storagePrefix="VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore"
-# This requires a newer version of BASH not avialble in MAC OS - storagePrefix=${storagePrefix,,} 
 storagePrefix=$(echo "${storagePrefix}" | tr '[:upper:]' '[:lower:]')
+echo ".working with ${storagePrefix} account name."
+read -p "$(echo -e -n "${INPUT}Create new Storage Account for Drupal Persistent Shares? [Y/n]:"${RESET})" continuescript
+# This requires a newer version of BASH not avialble in MAC OS - storagePrefix=${storagePrefix,,} 
 if [[ ${continuescript,,} != "n" ]]; then
     ~/bin/az storage account create -n $storagePrefix -g ossdemo-appdev-acs -l eastus --sku Standard_LRS
 fi
+
 echo ".getting storage account connection string for ${storagePrefix}"
 STORAGECONN=`~/bin/az storage account show-connection-string -n ${storagePrefix} -g ossdemo-appdev-acs --query connectionString -o tsv`
 echo ".found ${STORAGECONN}"
