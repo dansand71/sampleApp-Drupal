@@ -7,11 +7,15 @@ RED="\033[0;31m"
 
 echo -e "${BOLD}Create Drupal Storage Account?...${RESET}"
 read -p "$(echo -e -n "${INPUT}Create new Storage Account for Drupal Persistent Shares? [Y/n]:"${RESET})" continuescript
+read -p "$(echo -e -n "${INPUT}.Storage Name? (default: VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore) Must be lowercase:"${RESET})" storagePrefix
+[ -z "${storagePrefix}" ] && storagePrefix="VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore"
+# This requires a newer version of BASH not avialble in MAC OS - storagePrefix=${storagePrefix,,} 
+storagePrefix=$(echo "${storagePrefix}" | tr '[:upper:]' '[:lower:]')
 if [[ ${continuescript,,} != "n" ]]; then
-    ~/bin/az storage account create -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-acs -l eastus --sku Standard_LRS
+    ~/bin/az storage account create -n $storagePrefix -g ossdemo-appdev-acs -l eastus --sku Standard_LRS
 fi
-echo ".getting storage account connection string for VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore"
-STORAGECONN=`~/bin/az storage account show-connection-string -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-acs --query connectionString -o tsv`
+echo ".getting storage account connection string for ${storagePrefix}"
+STORAGECONN=`~/bin/az storage account show-connection-string -n ${storagePrefix} -g ossdemo-appdev-acs --query connectionString -o tsv`
 echo ".found ${STORAGECONN}"
 echo ".creating shares"
 ~/bin/az storage share create --name drupal-sites --connection-string "${STORAGECONN}" --quota 100
@@ -29,9 +33,9 @@ echo "-----------------------------"
 
 echo ".base64 encoding Storage Account name and Key"
 #tell kubernetes about the secret with base64 incoding
-B64STORAGENAME=`echo "VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore" | base64 --wrap=0`
+B64STORAGENAME=`echo "${storagePrefix}" | base64 --wrap=0`
 echo ".base64 storagename:${B64STORAGENAME}"
-B64STORAGEKEY=`~/bin/az storage account keys list -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-acs --query [1].value -o tsv | base64 --wrap=0`
+B64STORAGEKEY=`~/bin/az storage account keys list -n ${storagePrefix} -g ossdemo-appdev-acs --query [1].value -o tsv | base64 --wrap=0`
 echo ".base64 access key:${B64STORAGEKEY}"
 
 #SED the secret file
