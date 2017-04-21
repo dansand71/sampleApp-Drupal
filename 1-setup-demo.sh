@@ -24,7 +24,7 @@ echo ".creating mount point"
 ./environment/create-mount-point.sh
 echo ".copying assets into storage file shares for initial setup"
 #copy files into shares
-cp -r ./vm-assets/sites /mnt/drupal-sites
+cp -r ./vm-assets/sites/. /mnt/drupal-sites/.
 echo "-----------------------------"
 
 echo ".base64 encoding Storage Account name and Key"
