@@ -30,7 +30,7 @@ echo "-----------------------------"
 echo ".base64 encoding Storage Account name and Key"
 #tell kubernetes about the secret with base64 incoding
 B64STORAGENAME=`echo "VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore" | base64`
-B64STORAGEKEY=`~/bin/az storage account keys list -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-paas --query [1].value -o tsv | base64`
+B64STORAGEKEY=`~/bin/az storage account keys list -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-paas --query [1].value -o tsv | base64 --wrap=0`
 echo ".base64 access key:${B64STORAGEKEY}"
 
 #SED the secret file
