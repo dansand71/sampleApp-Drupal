@@ -11,13 +11,13 @@ if [[ ${continuescript,,} != "n" ]]; then
     ~/bin/az storage account create -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-paas -l eastus --sku Standard_LRS
 fi
 echo ".getting storage account connection string for VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore"
-STORAGECONN=`~/bin/az storage account show-connection-string -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-paas`
+STORAGECONN=`~/bin/az storage account show-connection-string -n VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore -g ossdemo-appdev-paas --query connectionString -o tsv`
 echo ".found ${STORAGECONN}"
 echo ".creating shares"
-~/bin/az storage share create --name drupal-sites --connection-string ${STORAGECONN} --quota 100
-~/bin/az storage share create --name drupal-themes --connection-string ${STORAGECONN} --quota 100
-~/bin/az storage share create --name drupal-modules --connection-string ${STORAGECONN} --quota 100
-~/bin/az storage share create --name drupal-profiles --connection-string ${STORAGECONN} --quota 100
+~/bin/az storage share create --name drupal-sites --connection-string "${STORAGECONN}" --quota 100
+~/bin/az storage share create --name drupal-themes --connection-string "${STORAGECONN}" --quota 100
+~/bin/az storage share create --name drupal-modules --connection-string "${STORAGECONN}" --quota 100
+~/bin/az storage share create --name drupal-profiles --connection-string "${STORAGECONN}" --quota 100
 
 echo ".creating mount point"
 #Create Mount Point
