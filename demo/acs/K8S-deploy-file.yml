@@ -45,6 +45,8 @@ spec:
             secretName: azurefile-drupal-secret
             shareName: drupal-themes
             readOnly: false
+      securityContext:  #mount the disks as www-data instead of the default Root
+        fsGroup: 1234
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -71,7 +73,7 @@ spec:
         env:
           - name: MYSQL_ROOT_PASSWORD
             # change this
-            value: pass@word1
+            value: REPLACEMYSQLPASSWORD
       volumes:
       - name: mysql-home
         persistentVolumeClaim:

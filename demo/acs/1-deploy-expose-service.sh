@@ -10,6 +10,28 @@ echo ".delete existing drupal-deployment"
 kubectl delete deployment drupal-deployment
 #
 
+if grep -Fxq "REPLACEMYSQLPASSWORD" ./K8S-deploy-file.yml
+then
+    echo ".Please enter new MYSQL root password:"
+    while true
+    do
+    read -s -p "$(echo -e -n "${INPUT}.New Admin Password for MYSQL:${RESET}")" mysqlPassword
+    echo ""
+    read -s -p "$(echo -e -n "${INPUT}.Re-enter to verify:${RESET}")" mysqlPassword2
+    
+    if [ $mysqlPassword = $mysqlPassword2 ]
+    then
+        break 2
+    else
+        echo -e ".${RED}Passwords do not match.  Please retry. ${RESET}"
+    fi
+    done
+    sed -i -e "s|REPLACEMYSQLPASSWORD|${mysqlPassword}|g" ./K8S-deploy-file.yml
+else
+    echo ".mysql password already changed.  Skipping prompt for new password."
+fi
+
+
 echo "-------------------------"
 echo "Deploy the app deployment"
 kubectl create -f K8S-deploy-file.yml
