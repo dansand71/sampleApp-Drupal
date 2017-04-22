@@ -46,7 +46,7 @@ spec:
             shareName: drupal-themes
             readOnly: false
       securityContext:  #mount the disks as www-data instead of the default Root
-        fsGroup: 1234
+        fsGroup: 33
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
