@@ -19,6 +19,10 @@ spec:
             value: REPLACEAZURESTORAGEMOUNT
         ports:
         - containerPort: 80
+        securityContext:  #Try to allow for mounting in a container
+          capabilities:
+            add:
+            - SYS_ADMIN  #needed to test the mount capabilites after container boot
         volumeMounts:
         - mountPath: /var/www/html/modules
           name: drupal-modules
@@ -51,9 +55,6 @@ spec:
             readOnly: false
       securityContext:  #mount the disks as www-data instead of the default Root - waiting for Azure files to support fsGroup
         fsGroup: 33
-        capabilities:
-          add:
-          - SYS_ADMIN  #needed to test the mount capabilites after container boot
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
