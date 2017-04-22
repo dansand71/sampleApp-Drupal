@@ -7,7 +7,7 @@ RED="\033[0;31m"
 
 echo -e "${BOLD}Create Drupal Storage Account?...${RESET}"
 DEFAULTSACCT="VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore"
-read -p "$(echo -e -n "${INPUT}.Storage Account Name to work with? (default: VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore) Must be lowercase:"${RESET})" storagePrefix
+read -p "$(echo -e -n "${INPUT}.Storage Account Name to work with? (ex: VALUEOF-UNIQUE-SERVER-PREFIXdrupalstore) Must be lowercase:"${RESET})" storagePrefix
 [ -z "${storagePrefix}" ] && storagePrefix=${DEFAULTSACCT}
 storagePrefix=$(echo "${storagePrefix}" | tr '[:upper:]' '[:lower:]')
 echo ".working with ${storagePrefix} account name."
