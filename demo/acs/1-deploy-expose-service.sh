@@ -8,6 +8,7 @@ RED="\033[0;31m"
 #az account set --subscription "Microsoft Azure Internal Consumption"
 echo ".delete existing drupal-deployment"
 kubectl delete deployment drupal-deployment
+kubectl delele deployment mysqlsvc-deployment
 #
 
 if grep -Fq "REPLACEMYSQLPASSWORD" ./K8S-deploy-file.yml

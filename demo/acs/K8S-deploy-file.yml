@@ -13,6 +13,10 @@ spec:
       - name: drupal
         image: drupal
         imagePullPolicy: Always
+        env:
+          - name: AZSTORAGEMOUNT
+            # change this
+            value: REPLACEAZURESTORAGEMOUNT
         ports:
         - containerPort: 80
         volumeMounts:
@@ -45,8 +49,8 @@ spec:
             secretName: azurefile-drupal-secret
             shareName: drupal-themes
             readOnly: false
-      securityContext:  #mount the disks as www-data instead of the default Root
-        fsGroup: 33
+      #securityContext:  #mount the disks as www-data instead of the default Root - waiting for Azure files to support fsGroup
+        #fsGroup: 33
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
