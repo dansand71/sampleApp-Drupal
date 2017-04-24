@@ -23,36 +23,36 @@ spec:
           capabilities:
             add:
             - SYS_ADMIN  #needed to test the mount capabilites after container boot
-      #   volumeMounts:
-      #   - mountPath: /var/www/html/modules
-      #     name: drupal-modules
-      #   - mountPath: /var/www/html/profiles
-      #     name: drupal-profiles
-      #   - mountPath: /var/www/html/sites
-      #     name: drupal-sites
-      #   - mountPath: /var/www/html/themes
-      #     name: drupal-themes
-      # volumes:
-      #   - name: drupal-modules
-      #     azureFile:
-      #       secretName: azurefile-drupal-secret
-      #       shareName: drupal-modules
-      #       readOnly: false
-      #   - name: drupal-profiles
-      #     azureFile:
-      #       secretName: azurefile-drupal-secret
-      #       shareName: drupal-profiles
-      #       readOnly: false
-      #   - name: drupal-sites
-      #     azureFile:
-      #       secretName: azurefile-drupal-secret
-      #       shareName: drupal-sites
-      #       readOnly: false
-      #   - name: drupal-themes
-      #     azureFile:
-      #       secretName: azurefile-drupal-secret
-      #       shareName: drupal-themes
-      #       readOnly: false
+        volumeMounts:
+        - mountPath: /var/www/html/modules
+          name: drupal-modules
+        - mountPath: /var/www/html/profiles
+          name: drupal-profiles
+        - mountPath: /var/www/html/sites
+          name: drupal-sites
+        - mountPath: /var/www/html/themes
+          name: drupal-themes
+      volumes:
+        - name: drupal-modules
+          azureFile:
+            secretName: azurefile-drupal-secret
+            shareName: drupal-modules
+            readOnly: false
+        - name: drupal-profiles
+          azureFile:
+            secretName: azurefile-drupal-secret
+            shareName: drupal-profiles
+            readOnly: false
+        - name: drupal-sites
+          azureFile:
+            secretName: azurefile-drupal-secret
+            shareName: drupal-sites
+            readOnly: false
+        - name: drupal-themes
+          azureFile:
+            secretName: azurefile-drupal-secret
+            shareName: drupal-themes
+            readOnly: false
       securityContext:  #mount the disks as www-data instead of the default Root - waiting for Azure files to support fsGroup
         fsGroup: 33
 ---
@@ -88,6 +88,40 @@ spec:
           claimName: mysql-pv
 
 ---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nfs-server-deployment
+spec:
+  replicas: 1 # tells deployment to run x pods matching the template
+  template: # create pods using pod definition in this template
+    metadata:
+      labels:
+        app: nfs-server-app
+    spec:
+      containers:
+      - name: nfs-server
+        image: gcr.io/google-samples/nfs-server:1.1
+        ports:
+        - containerPort: 3306
+       ports:
+          - name: nfs
+            containerPort: 2049
+          - name: mountd
+            containerPort: 20048
+          - name: rpcbind
+            containerPort: 111
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - mountPath: /exports
+            name: nfspvc
+      volumes:
+        - name: nfspvc
+          persistentVolumeClaim:
+            claimName: nfs-pv-provisioning-demo
+
+---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1beta1
 metadata:
@@ -100,6 +134,19 @@ apiVersion: "v1"
 kind: "PersistentVolumeClaim"
 metadata:
   name: "mysql-pv"
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "slow"
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "10Gi"
+---
+apiVersion: "v1"
+kind: "PersistentVolumeClaim"
+metadata:
+  name: "nfs-pv-provisioning-demo"
   annotations:
     volume.beta.kubernetes.io/storage-class: "slow"
 spec:
