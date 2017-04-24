@@ -4,6 +4,7 @@ metadata:
   name: nfs-sites-pvc
   labels:
 spec:
+  volumeName: nfs-sites-pv
   accessModes:
     - ReadWriteMany
   resources:
