@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: drupal-deployment
+spec:
+  replicas: 1 # tells deployment to run x pods matching the template
+  template: # create pods using pod definition in this template
+    metadata:
+      labels:
+        app: drupal-app
+    spec:
+      containers:
+      - name: drupal
+        image: drupal
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        securityContext:  #Try to allow for mounting in a container
+          capabilities:
+            add:
+            - SYS_ADMIN  #needed to test the mount capabilites after container boot
+        volumeMounts:       
+          # testing nfs mount
+        - mountPath: "/usr/share/nfs"
+          name: nfs
+              
+      volumes:
+        - name: nfs
+          persistentVolumeClaim:
+            claimName: nfs
+      securityContext:  #mount the disks as www-data instead of the default Root - waiting for Azure files to support fsGroup
+        fsGroup: 33
