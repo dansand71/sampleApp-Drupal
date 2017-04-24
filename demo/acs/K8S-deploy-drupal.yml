@@ -19,37 +19,9 @@ spec:
           # testing nfs mount
         - mountPath: "/var/www/html/sites"
           name: nfs-sites
-              
-      volumes:
+        volumes:
         - name: nfs-sites
           persistentVolumeClaim:
             claimName: nfs-sites-pvc
       securityContext:  #mount the disks as www-data instead of the default Root - waiting for Azure files to support fsGroup
         fsGroup: 33
-
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: nfs-sites-pv
-spec:
-  capacity:
-    storage: 1Mi
-  accessModes:
-    - ReadWriteMany
-  nfs:
-    # FIXME: use the right IP
-    server: 10.244.1.4
-    path: "/exports/sites"
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: nfs-sites-pvc
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Mi
-

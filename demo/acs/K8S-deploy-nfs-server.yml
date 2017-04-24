@@ -32,7 +32,7 @@ spec:
 kind: StorageClass
 apiVersion: storage.k8s.io/v1beta1
 metadata:
-  name: slow
+  name: az-std-disk
 provisioner: kubernetes.io/azure-disk
 parameters:
   skuName: Standard_LRS
@@ -42,7 +42,7 @@ kind: "PersistentVolumeClaim"
 metadata:
   name: "nfs-server-pvc"
   annotations:
-    volume.beta.kubernetes.io/storage-class: "slow"
+    volume.beta.kubernetes.io/storage-class: "az-std-disk"
 spec:
   accessModes:
     - "ReadWriteOnce"
