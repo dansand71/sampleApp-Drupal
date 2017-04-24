@@ -56,7 +56,7 @@ do
 clusterip=`kubectl get services nfs -o json | jq --raw-output '.status.loadBalancer.ingress[0].ip'`
 echo "ClusterIP:${clusterip}"
     if [[ $clusterip != *"null"* ]]; then
-    echo ".clusterip is available"
+    echo ".clusterip is available - moving on to mounting and copying files."
     break
     else
     echo ".clusterip looks to be pending.  Sleeping 20 secs.  query result:${clusterip}"
@@ -66,14 +66,17 @@ done
 #Mount jumpbox to the new NFS cluster point and copy the files
 echo "Create mount directory:/mnt/drupal"
 sudo mkdir -p /mnt/drupal
+echo "Unmount this directory if it already exists"
+sudo umount -l /mnt/drupal
 echo "Create mount point, make directories and copy files."
 #sudo mount -t cifs //REPLACEDRUPALSTORAGEACCOUNT.file.core.windows.net/drupal-sites /mnt/drupal-sites -o vers=3.0,username=REPLACEDRUPALSTORAGEACCOUNT,password=REPLACEDRUPALSTORAGEKEY,dir_mode=0777,file_mode=0777
+clusterip=`kubectl get services nfs -o json | jq --raw-output '.status.loadBalancer.ingress[0].ip'`
 sudo mount -t nfs ${clusterip}:/ /mnt/drupal
-mkdir -p /mnt/drupal/sites
-mkdir -p /mnt/drupal/modules
-mkdir -p /mnt/drupal/themes
-mkdir -p /mnt/drupal/profiles
-cp -r ./vm-assets/sites/. /mnt/drupal/sites/.
+sudo mkdir -p /mnt/drupal/sites
+sudo mkdir -p /mnt/drupal/modules
+sudo mkdir -p /mnt/drupal/themes
+sudo mkdir -p /mnt/drupal/profiles
+sudo cp -r ./vm-assets/sites/. /mnt/drupal/sites/.
 sudo umount /mnt/drupal
 echo "Create mysql and drupal deployments."
 kubectl create -f deploy-mysql.yml
