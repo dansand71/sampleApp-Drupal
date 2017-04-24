@@ -53,7 +53,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: nfs-server-deployment
+  name: nfs-server
 spec:
   ports:
     - name: nfs

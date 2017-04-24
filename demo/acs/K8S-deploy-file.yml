@@ -32,6 +32,11 @@ spec:
           name: drupal-sites
         - mountPath: /var/www/html/themes
           name: drupal-themes
+        
+          # testing nfs mount
+        - mountPath: "/usr/share/nfs"
+          name: nfspvc
+              
       volumes:
         - name: drupal-modules
           azureFile:
@@ -53,6 +58,9 @@ spec:
             secretName: azurefile-drupal-secret
             shareName: drupal-themes
             readOnly: false
+        - name: nfspvc
+          persistentVolumeClaim:
+            claimName: nfs-pvc
       securityContext:  #mount the disks as www-data instead of the default Root - waiting for Azure files to support fsGroup
         fsGroup: 33
 ---
@@ -143,16 +151,16 @@ spec:
     requests:
       storage: "10Gi"
 ---
-apiVersion: "v1"
+apiVersion: v1
 kind: "PersistentVolumeClaim"
 metadata:
-  name: "nfs-pv-provisioning-demo"
-  annotations:
-    volume.beta.kubernetes.io/storage-class: "slow"
+  name: nfspvc
 spec:
+  capacity:
+    storage: 1Mi
   accessModes:
-    - "ReadWriteOnce"
-  resources:
-    requests:
-      storage: "10Gi"
----
+    - ReadWriteMany
+  nfs:
+    # FIXME: use the right IP
+    server: 10.0.140.225
+    path: "/exports"
