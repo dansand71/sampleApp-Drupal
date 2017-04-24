@@ -47,6 +47,7 @@ kubectl create -f pv-nfs-server.yml
 kubectl create -f pv-mysql.yml
 kubectl create -f pv-drupal-nfs-client.yml
 echo "-------------------------"
+sleep 15
 echo "Deploy the pods"
 kubectl create -f deploy-nfs-server.yml
 kubectl create -f deploy-mysql.yml

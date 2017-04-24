@@ -22,6 +22,6 @@ spec:
       volumes:
         - name: nfs-sites
           persistentVolumeClaim:
-            claimName: nfs-sites-pvc
+            claimName: nfs-sites
       securityContext:  #mount the disks as www-data instead of the default Root - waiting for Azure files to support fsGroup
         fsGroup: 33
