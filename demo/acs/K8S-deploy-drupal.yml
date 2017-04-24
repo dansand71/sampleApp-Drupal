@@ -19,7 +19,7 @@ spec:
           # testing nfs mount
         - mountPath: "/var/www/html/sites"
           name: nfs-sites
-        volumes:
+      volumes:
         - name: nfs-sites
           persistentVolumeClaim:
             claimName: nfs-sites-pvc
