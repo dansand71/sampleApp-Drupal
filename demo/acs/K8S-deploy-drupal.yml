@@ -15,18 +15,41 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 80
-        securityContext:  #Try to allow for mounting in a container
-          capabilities:
-            add:
-            - SYS_ADMIN  #needed to test the mount capabilites after container boot
         volumeMounts:       
           # testing nfs mount
-        - mountPath: "/usr/share/nfs"
-          name: nfs
+        - mountPath: "/var/www/html/sites"
+          name: nfs-sites
               
       volumes:
-        - name: nfs
+        - name: nfs-sites
           persistentVolumeClaim:
-            claimName: nfs
+            claimName: nfs-sites-pvc
       securityContext:  #mount the disks as www-data instead of the default Root - waiting for Azure files to support fsGroup
         fsGroup: 33
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-sites-pv
+spec:
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    # FIXME: use the right IP
+    server: 10.244.1.4
+    path: "/exports/sites"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nfs-sites-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Mi
+

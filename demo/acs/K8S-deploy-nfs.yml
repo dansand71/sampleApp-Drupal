@@ -23,11 +23,11 @@ spec:
           privileged: true
         volumeMounts:
           - mountPath: /exports
-            name: nfspvc
+            name: nfs-server-pv
       volumes:
-        - name: nfspvc
+        - name: nfs-server-pv
           persistentVolumeClaim:
-            claimName: nfs-pv-provisioning-demo
+            claimName: nfs-server-pvc
 ---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1beta1
@@ -40,7 +40,7 @@ parameters:
 apiVersion: "v1"
 kind: "PersistentVolumeClaim"
 metadata:
-  name: "nfs-pv-provisioning-demo"
+  name: "nfs-server-pvc"
   annotations:
     volume.beta.kubernetes.io/storage-class: "slow"
 spec:
