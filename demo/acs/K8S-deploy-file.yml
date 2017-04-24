@@ -60,7 +60,7 @@ spec:
             readOnly: false
         - name: nfspvc
           persistentVolumeClaim:
-            claimName: nfs-pvc
+            claimName: nfspvc
       securityContext:  #mount the disks as www-data instead of the default Root - waiting for Azure files to support fsGroup
         fsGroup: 33
 ---
@@ -94,40 +94,6 @@ spec:
       - name: mysql-home
         persistentVolumeClaim:
           claimName: mysql-pv
-
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: nfs-server-deployment
-spec:
-  replicas: 1 # tells deployment to run x pods matching the template
-  template: # create pods using pod definition in this template
-    metadata:
-      labels:
-        app: nfs-server-app
-    spec:
-      containers:
-      - name: nfs-server
-        image: gcr.io/google-samples/nfs-server:1.1
-        ports:
-        - containerPort: 3306
-       ports:
-          - name: nfs
-            containerPort: 2049
-          - name: mountd
-            containerPort: 20048
-          - name: rpcbind
-            containerPort: 111
-        securityContext:
-          privileged: true
-        volumeMounts:
-          - mountPath: /exports
-            name: nfspv
-      volumes:
-        - name: nfspv
-          persistentVolumeClaim:
-            claimName: nfspvc
 
 ---
 kind: StorageClass
