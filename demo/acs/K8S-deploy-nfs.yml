@@ -13,8 +13,6 @@ spec:
       - name: nfs-server
         image: gcr.io/google-samples/nfs-server:1.1
         ports:
-        - containerPort: 3306
-       ports:
           - name: nfs
             containerPort: 2049
           - name: mountd
@@ -52,3 +50,17 @@ spec:
     requests:
       storage: "10Gi"
 ---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nfs-server-deployment
+spec:
+  ports:
+    - name: nfs
+      port: 2049
+    - name: mountd
+      port: 20048
+    - name: rpcbind
+      port: 111
+  selector:
+    app: nfs-server-app
