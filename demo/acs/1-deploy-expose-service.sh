@@ -51,10 +51,10 @@ echo "Deploy the pods"
 kubectl create -f deploy-nfs-server.yml
 kubectl expose deployments nfs-server-deployment --port=2049 --target-port=2049 --type=LoadBalancer --name=nfs
 echo ".deployed nfs server - now wait until the clusterip is available"
-while 
+while true;
 do
 echo ".checking for cluster ip"
-clusterip=`kubectl get services nfs -o json | jq --raw-output '.spec.clusterIP'`
+clusterip=`kubectl get services nfs -o json | jq --raw-output '.status.loadBalancer.ingress[0].ip'
 echo "ClusterIP:${clusterip}"
     if [[ $clusterip == *"10."* ]]; then
     echo ".clusterip is available"
