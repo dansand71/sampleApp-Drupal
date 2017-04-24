@@ -47,9 +47,34 @@ kubectl create -f pv-nfs-server.yml
 kubectl create -f pv-mysql.yml
 kubectl create -f pv-drupal-nfs-client.yml
 echo "-------------------------"
-sleep 15
 echo "Deploy the pods"
 kubectl create -f deploy-nfs-server.yml
+kubectl expose deployments nfs-server-deployment --port=2049 --target-port=2049 --type=LoadBalancer --name=nfs
+echo ".deployed nfs server - now wait until the clusterip is available"
+while 
+do
+echo ".checking for cluster ip"
+clusterip=`kubectl get services nfs -o json | jq --raw-output '.spec.clusterIP'`
+echo "ClusterIP:${clusterip}"
+    if [[ $clusterip == *"10."* ]]; then
+    echo ".clusterip is available"
+    else
+    echo ".clusterip looks to be pending.  Sleeping 20 secs.  query result:${clusterip}"
+    sleep 20
+    fi
+done
+#Mount jumpbox to the new NFS cluster point and copy the files
+echo "Create mount directory:/mnt/drupal"
+sudo mkdir -p /mnt/drupal
+echo "Create mount point, make directories and copy files."
+#sudo mount -t cifs //REPLACEDRUPALSTORAGEACCOUNT.file.core.windows.net/drupal-sites /mnt/drupal-sites -o vers=3.0,username=REPLACEDRUPALSTORAGEACCOUNT,password=REPLACEDRUPALSTORAGEKEY,dir_mode=0777,file_mode=0777
+sudo mount -t nfs ${clusterip}:/ /mnt/drupal
+mkdir /mnt/drupal/sites
+mkdir /mnt/drupal/modules
+mkdir /mnt/drupal/themes
+mkdir /mnt/drupal/profiles
+cp -r ./vm-assets/sites/. /mnt/drupal/sites/.
+echo "Create mysql and drupal deployments."
 kubectl create -f deploy-mysql.yml
 kubectl create -f deploy-drupal.yml
 echo "-------------------------"
@@ -57,7 +82,7 @@ echo "-------------------------"
 echo "Initial deployment & expose the service"
 kubectl expose deployments mysqlsvc-deployment --port=3306 --target-port=3306 --name=mysqlsvc
 kubectl expose deployments drupal-deployment --port=80 --target-port=80 --type=LoadBalancer --name=drupal
-kubectl expose deployments nfs-server-deployment --port=2049 --target-port=2049 --type=LoadBalancer --name=nfs
+kubectl delete service nfs #cleanup so we dont leave the NFS server exposed
 
 echo "Deployment complete for pods: nodejs-todo & nosqlsvc"
 

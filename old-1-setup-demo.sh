@@ -17,24 +17,24 @@ if [[ ${continuescript,,} != "n" ]]; then
     ~/bin/az storage account create -n $storagePrefix -g ossdemo-appdev-paas -l eastus --sku Standard_LRS
 fi
 
-echo ".getting storage account connection string for ${storagePrefix}"
-STORAGECONN=`~/bin/az storage account show-connection-string -n ${storagePrefix} -g ossdemo-appdev-paas --query connectionString -o tsv`
-echo ".found ${STORAGECONN}"
-echo ".creating shares"
-~/bin/az storage share create --name drupal-sites --connection-string "${STORAGECONN}" --quota 100
-~/bin/az storage share create --name drupal-themes --connection-string "${STORAGECONN}" --quota 100
-~/bin/az storage share create --name drupal-modules --connection-string "${STORAGECONN}" --quota 100
-~/bin/az storage share create --name drupal-profiles --connection-string "${STORAGECONN}" --quota 100
+# echo ".getting storage account connection string for ${storagePrefix}"
+# STORAGECONN=`~/bin/az storage account show-connection-string -n ${storagePrefix} -g ossdemo-appdev-paas --query connectionString -o tsv`
+# echo ".found ${STORAGECONN}"
+# echo ".creating shares"
+# ~/bin/az storage share create --name drupal-sites --connection-string "${STORAGECONN}" --quota 100
+# ~/bin/az storage share create --name drupal-themes --connection-string "${STORAGECONN}" --quota 100
+# ~/bin/az storage share create --name drupal-modules --connection-string "${STORAGECONN}" --quota 100
+# ~/bin/az storage share create --name drupal-profiles --connection-string "${STORAGECONN}" --quota 100
 
-echo ".getting storage key"
-STORAGEKEY=`~/bin/az storage account keys list -n ${storagePrefix} -g ossdemo-appdev-paas --query [1].value -o tsv`
+# echo ".getting storage key"
+# STORAGEKEY=`~/bin/az storage account keys list -n ${storagePrefix} -g ossdemo-appdev-paas --query [1].value -o tsv`
 
-echo ".creating mount point"
-#Create Mount Point
-#delete the mount point if it exists
-sudo umount /mnt/drupal-sites
-sed -i -e "s|REPLACEDRUPALSTORAGEACCOUNT|${storagePrefix}|g" ./environment/create-mount-point.sh
-sed -i -e "s|REPLACEDRUPALSTORAGEKEY|${STORAGEKEY}|g" ./environment/create-mount-point.sh
+# echo ".creating mount point"
+# #Create Mount Point
+# #delete the mount point if it exists
+# sudo umount /mnt/drupal-sites
+# sed -i -e "s|REPLACEDRUPALSTORAGEACCOUNT|${storagePrefix}|g" ./environment/create-mount-point.sh
+# sed -i -e "s|REPLACEDRUPALSTORAGEKEY|${STORAGEKEY}|g" ./environment/create-mount-point.sh
 ./environment/create-mount-point.sh
 echo ".copying assets into storage file shares for initial setup"
 #copy files into shares
