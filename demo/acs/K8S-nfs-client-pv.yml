@@ -7,7 +7,10 @@ spec:
     storage: 10Gi
   accessModes:
     - ReadWriteMany
+  claimRef:
+    namespace: default
+    name: nfs-sites-pvc
   nfs:
     # FIXME: use the right IP
     server: 10.244.1.4
-    path: "/exports"
+    path: "/exports/sites"

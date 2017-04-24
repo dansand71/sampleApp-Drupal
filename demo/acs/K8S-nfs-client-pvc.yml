@@ -2,9 +2,11 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: nfs-sites-pvc
+  labels:
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
       storage: 10Gi
+  
