@@ -94,3 +94,4 @@ kubectl get pods
 
 echo ".to bash into individual pods - kubectl exec -p <podname> -i -t -- bash -il"
 echo ".to check deployment status - kubectl describe po <podname>"
+echo "- next step is to bash into the pod and chown /var/www/html/sites to www-data"
