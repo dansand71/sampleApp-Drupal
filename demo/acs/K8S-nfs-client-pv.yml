@@ -7,10 +7,21 @@ spec:
     storage: 10Gi
   accessModes:
     - ReadWriteMany
-  claimRef:
-    namespace: default
-    name: nfs-sites-pvc
   nfs:
     # FIXME: use the right IP
     server: 10.244.1.4
     path: "/exports"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nfs-sites-pvc
+  labels:
+spec:
+  volumeName: nfs-sites-pv
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  
