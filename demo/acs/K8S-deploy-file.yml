@@ -123,11 +123,11 @@ spec:
           privileged: true
         volumeMounts:
           - mountPath: /exports
-            name: nfspvc
+            name: nfspv
       volumes:
-        - name: nfspvc
+        - name: nfspv
           persistentVolumeClaim:
-            claimName: nfs-pv-provisioning-demo
+            claimName: nfspvc
 
 ---
 kind: StorageClass
