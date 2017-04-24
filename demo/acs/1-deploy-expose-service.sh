@@ -8,7 +8,15 @@ RED="\033[0;31m"
 #az account set --subscription "Microsoft Azure Internal Consumption"
 echo ".delete existing drupal-deployment"
 kubectl delete deployment drupal-deployment
+kubectl delete pvc nfs-sites
+kubectl delete pv nfs-sites
+
 kubectl delete deployment mysqlsvc-deployment
+
+kubectl delete deployment nfs-server
+kubectl delete pvc nfs-server
+kubectl delete pv nfs-server
+
 #
 
 if grep -Fq "REPLACEMYSQLPASSWORD" ./K8S-deploy-file.yml
@@ -34,13 +42,21 @@ fi
 
 
 echo "-------------------------"
-echo "Deploy the app deployment"
-kubectl create -f K8S-deploy-file.yml
+echo "Deploy the Persistent Volume claims"
+kubectl create -f pv-nfs-server.yml
+kubectl create -f pv-mysql.yml
+kubectl create -f pv-drupal-nfs-client.yml
+echo "-------------------------"
+echo "Deploy the pods"
+kubectl create -f deploy-nfs-server.yml
+kubectl create -f deploy-mysql.yml
+kubectl create -f deploy-drupal.yml
 echo "-------------------------"
 
 echo "Initial deployment & expose the service"
 kubectl expose deployments mysqlsvc-deployment --port=3306 --target-port=3306 --name=mysqlsvc
 kubectl expose deployments drupal-deployment --port=80 --target-port=80 --type=LoadBalancer --name=drupal
+kubectl expose deployments nfs-server-deployment --port=2049 --target-port=2049 --type=LoadBalancer --name=nfs
 
 echo "Deployment complete for pods: nodejs-todo & nosqlsvc"
 
@@ -52,5 +68,3 @@ kubectl get pods
 
 echo ".to bash into individual pods - kubectl exec -p <podname> -i -t -- bash -il"
 echo ".to check deployment status - kubectl describe po <podname>"
-
-

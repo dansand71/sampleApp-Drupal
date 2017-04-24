@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: nfs-server
-        image: gcr.io/google-samples/nfs-server:1.1
+        image: gcr.io/google_containers/volume-nfs:0.8
         ports:
           - name: nfs
             containerPort: 2049
@@ -28,27 +28,6 @@ spec:
         - name: nfs-server-pv
           persistentVolumeClaim:
             claimName: nfs-server-pvc
----
-kind: StorageClass
-apiVersion: storage.k8s.io/v1beta1
-metadata:
-  name: az-premium-disk
-provisioner: kubernetes.io/azure-disk
-parameters:
-  skuName: Premium_LRS
----
-apiVersion: "v1"
-kind: "PersistentVolumeClaim"
-metadata:
-  name: "nfs-server-pvc"
-  annotations:
-    volume.beta.kubernetes.io/storage-class: "az-premium-disk"
-spec:
-  accessModes:
-    - "ReadWriteOnce"
-  resources:
-    requests:
-      storage: "10Gi"
 ---
 kind: Service
 apiVersion: v1
