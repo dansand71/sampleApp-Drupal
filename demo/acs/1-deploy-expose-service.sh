@@ -76,7 +76,7 @@ sudo mkdir -p /mnt/drupal/sites
 sudo mkdir -p /mnt/drupal/modules
 sudo mkdir -p /mnt/drupal/themes
 sudo mkdir -p /mnt/drupal/profiles
-sudo cp -r ./vm-assets/sites/. /mnt/drupal/sites/.
+sudo cp -r /source/AppDev-ContainerDemo/sample-apps/drupal/vm-assets/sites/. /mnt/drupal/sites/.
 sudo umount /mnt/drupal
 echo "Create mysql and drupal deployments."
 kubectl create -f deploy-mysql.yml
