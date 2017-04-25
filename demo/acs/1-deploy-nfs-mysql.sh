@@ -70,3 +70,9 @@ echo " nfs-server-deployment-4254342066-x1bm7   1/1       Running   0          5
 echo " -----------------------------------------"
 echo "Current status:"
 kubectl get pods
+echo ""
+echo "To get location of VHD's for MYSQL and NFS:"
+kubectl get pvc
+echo "kubectl describe <paste PVC HERE>"
+echo "To bash into pod:"
+echo "kubectl exec -it <POD NAME HERE> bash"
