@@ -5,6 +5,7 @@ BOLD="\e[4m"
 YELLOW="\033[38;5;11m"
 RED="\033[0;31m"
 
+echo "This script deploys NFS and MYSQL.  Depending on size of disk it can take up to 10 mins to format the disk upon first provisioning for STD storage."
 echo ".delete existing mysql-deployment"
 kubectl delete deployment mysql-deployment
 echo ".delete existing nfs-server-deployment"
