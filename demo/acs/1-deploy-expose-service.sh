@@ -9,7 +9,13 @@ RED="\033[0;31m"
 echo ".delete existing drupal-deployment"
 kubectl delete deployment drupal-deployment
 kubectl delete pvc nfs-sites
+kubectl delete pvc nfs-profiles
+kubectl delete pvc nfs-modules
+kubectl delete pvc nfs-themes
 kubectl delete pv nfs-sites
+kubectl delete pv nfs-modules
+kubectl delete pv nfs-profiles
+kubectl delete pv nfs-themes
 
 #kubectl delete deployment mysqlsvc-deployment
 
@@ -63,7 +69,8 @@ echo "ClusterIP:${clusterip}"
     sleep 20
     fi
 done
-sed -i -e "s|REPLACENFSSERVERIP|${clusterip}|g" ./pv-drupal-nfs-client.yml
+internalip=`kubectl get services nfs -o json | jq --raw-output '.spec.clusterIP'`
+sed -i -e "s|REPLACENFSSERVERIP|${internalip}|g" ./pv-drupal-nfs-client.yml
 #Mount jumpbox to the new NFS cluster point and copy the files
 echo "Create mount directory:/mnt/drupal"
 sudo mkdir -p /mnt/drupal

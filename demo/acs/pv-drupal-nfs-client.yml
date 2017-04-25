@@ -1,4 +1,4 @@
-kind: PersistentVolumeClaim
+kind: PersistentVolume
 apiVersion: v1
 metadata:
   name: nfs-sites
@@ -52,4 +52,55 @@ spec:
     # FIXME: use the right IP
     server: REPLACENFSSERVERIP
     path: "/profiles"
-
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nfs-sites
+  labels:
+spec:
+  volumeName: nfs-sites
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nfs-profiles
+  labels:
+spec:
+  volumeName: nfs-profiles
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nfs-themes
+  labels:
+spec:
+  volumeName: nfs-themes
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nfs-modules
+  labels:
+spec:
+  volumeName: nfs-modules
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
