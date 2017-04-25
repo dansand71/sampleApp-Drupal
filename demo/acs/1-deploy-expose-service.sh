@@ -77,13 +77,14 @@ sudo mkdir -p /mnt/drupal/sites
 sudo mkdir -p /mnt/drupal/modules
 sudo mkdir -p /mnt/drupal/themes
 sudo mkdir -p /mnt/drupal/profiles
+#COPY
+sudo cp -r /source/AppDev-ContainerDemo/sample-apps/drupal/vm-assets/sites/. /mnt/drupal/sites/.
 #CHOWN to www-data
 sudo chown -R 33:33 /mnt/drupal/sites
 sudo chown -R 33:33 /mnt/drupal/modules
 sudo chown -R 33:33 /mnt/drupal/themes
 sudo chown -R 33:33 /mnt/drupal/profiles
 
-sudo cp -r /source/AppDev-ContainerDemo/sample-apps/drupal/vm-assets/sites/. /mnt/drupal/sites/.
 echo "Create mysql and drupal deployments."
 kubectl create -f deploy-mysql.yml
 kubectl create -f deploy-drupal.yml
