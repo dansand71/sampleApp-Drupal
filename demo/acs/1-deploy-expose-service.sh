@@ -19,7 +19,7 @@ kubectl delete pv nfs-sites
 
 #
 
-if grep -Fq "REPLACEMYSQLPASSWORD" ./K8S-deploy-file.yml
+if grep -Fq "REPLACEMYSQLPASSWORD" ./deploy-mysql.yml
 then
     echo ".Please enter new MYSQL root password:"
     while true
@@ -35,7 +35,7 @@ then
         echo -e ".${RED}Passwords do not match.  Please retry. ${RESET}"
     fi
     done
-    sed -i -e "s|REPLACEMYSQLPASSWORD|${mysqlPassword}|g" ./K8S-deploy-file.yml
+    sed -i -e "s|REPLACEMYSQLPASSWORD|${mysqlPassword}|g" ./deploy-mysql.yml
 else
     echo ".mysql password already changed.  Skipping prompt for new password."
 fi
