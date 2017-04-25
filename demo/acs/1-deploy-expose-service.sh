@@ -50,8 +50,15 @@ fi
 echo "-------------------------"
 echo "Deploy the Persistent Volume claims"
 kubectl create -f pv-nfs-server.yml
+echo ".deploy NFS Server PVC"
 kubectl create -f pv-mysql.yml
+echo ".deploy MYSQL Server PVC"
+sleep 5
+internalip=`kubectl get services nfs -o json | jq --raw-output '.spec.clusterIP'`
+echo ".working on internal NFS Server IP Address - found internal NFS Server ip at: ${internalip}"
+sed -i -e "s|REPLACENFSSERVERIP|${internalip}|g" ./pv-drupal-nfs-client.yml
 kubectl create -f pv-drupal-nfs-client.yml
+echo ".deploy DRUPAL NFS Client PVC"
 echo "-------------------------"
 echo "Deploy the pods"
 kubectl create -f deploy-nfs-server.yml
@@ -69,8 +76,6 @@ echo "ClusterIP:${clusterip}"
     sleep 20
     fi
 done
-internalip=`kubectl get services nfs -o json | jq --raw-output '.spec.clusterIP'`
-sed -i -e "s|REPLACENFSSERVERIP|${internalip}|g" ./pv-drupal-nfs-client.yml
 #Mount jumpbox to the new NFS cluster point and copy the files
 echo "Create mount directory:/mnt/drupal"
 sudo mkdir -p /mnt/drupal
