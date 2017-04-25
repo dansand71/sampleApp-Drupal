@@ -46,32 +46,34 @@ echo "ClusterIP:${clusterip}"
     echo ".clusterip is available - moving on to mounting and copying files."
     break
     else
-    echo ".clusterip looks to be pending.  Sleeping 20 secs.  query result:${clusterip}"
+    echo ".clusterip looks to be pending.  Sleeping 20 secs.  query result:${clusterip} - results of command:"
+    kubectl get deployments nfs-server-deployment
     sleep 20
     fi
 done
 #Mount jumpbox to the new NFS cluster point and copy the files
 echo "Create mount directory:/mnt/drupal"
-sudo mkdir -p /mnt/drupal
+sudo mkdir -p ~/drupal
 echo "Unmount this directory if it already exists"
-sudo umount -l /mnt/drupal
+sudo umount -l ~/drupal
 echo "Create mount point, make directories and copy files."
 #sudo mount -t cifs //REPLACEDRUPALSTORAGEACCOUNT.file.core.windows.net/drupal-sites /mnt/drupal-sites -o vers=3.0,username=REPLACEDRUPALSTORAGEACCOUNT,password=REPLACEDRUPALSTORAGEKEY,dir_mode=0777,file_mode=0777
 clusterip=`kubectl get services nfs -o json | jq --raw-output '.status.loadBalancer.ingress[0].ip'`
-sudo mount -t nfs ${clusterip}:/ /mnt/drupal
-sudo mkdir -p /mnt/drupal/sites
-sudo mkdir -p /mnt/drupal/modules
-sudo mkdir -p /mnt/drupal/themes
-sudo mkdir -p /mnt/drupal/profiles
+echo ".found public nfs endpoint at ${clusterip}"
+sudo mount -t nfs ${clusterip}:/ ~/drupal
+sudo mkdir -p ~/drupal/sites
+sudo mkdir -p ~/drupal/modules
+sudo mkdir -p ~/drupal/themes
+sudo mkdir -p ~/drupal/profiles
 #COPY
 ".COPYING SOURCE FILES - into /mnt/drupal/sites"
-sudo cp -r /source/AppDev-ContainerDemo/sample-apps/drupal/vm-assets/sites/. /mnt/drupal/sites/.
+sudo cp -r /source/AppDev-ContainerDemo/sample-apps/drupal/vm-assets/sites/. ~/drupal/sites/.
 #CHOWN to www-data
 ".changing ownership of source files so www-data can access the data."
-sudo chown -R 33:33 /mnt/drupal/sites
-sudo chown -R 33:33 /mnt/drupal/modules
-sudo chown -R 33:33 /mnt/drupal/themes
-sudo chown -R 33:33 /mnt/drupal/profiles
+sudo chown -R 33:33 ~/drupal/sites
+sudo chown -R 33:33 ~/drupal/modules
+sudo chown -R 33:33 ~/drupal/themes
+sudo chown -R 33:33 ~/drupal/profiles
 
 echo "Create drupal deployment."
 kubectl create -f deploy-drupal.yml
@@ -79,7 +81,7 @@ echo "-------------------------"
 
 echo "Initial deployment & expose the service"
 kubectl expose deployments drupal-deployment --port=80 --target-port=80 --type=LoadBalancer --name=drupal
-kubectl delete service nfs #cleanup so we dont leave the NFS server exposed
+#kubectl delete service nfs #cleanup so we dont leave the NFS server exposed
 
 echo "Deployment complete for drupal pods"
 
@@ -91,3 +93,9 @@ kubectl get pods
 
 echo ".to bash into individual pods - kubectl exec -p <podname> -i -t -- bash -il"
 echo ".to check deployment status - kubectl describe po <podname>"
+echo " --------------------------------------------------------"
+echo " ********************** IMPORTANT ***********************"
+echo " --------------------------------------------------------"
+echo " please delete the nfs server service endpoint once initial install is complete and confirmed."
+echo "kubectl delete service nfs"
+echo " --------------------------------------------------------"
