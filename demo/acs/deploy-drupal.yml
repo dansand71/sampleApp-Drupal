@@ -19,9 +19,24 @@ spec:
           # testing nfs mount
         - mountPath: "/var/www/html/sites"
           name: nfs-sites
+        - mountPath: "/var/www/html/modules"
+          name: nfs-modules
+        - mountPath: "/var/www/html/profiles"
+          name: nfs-profiles
+        - mountPath: "/var/www/html/themes"
+          name: nfs-themes
       volumes:
         - name: nfs-sites
           persistentVolumeClaim:
             claimName: nfs-sites
+        - name: nfs-modules
+          persistentVolumeClaim:
+            claimName: nfs-modules
+        - name: nfs-profiles
+          persistentVolumeClaim:
+            claimName: nfs-profiles
+        - name: nfs-themes
+          persistentVolumeClaim:
+            claimName: nfs-themes
       securityContext:  #mount the disks as www-data instead of the default Root - waiting for Azure files to support fsGroup
         fsGroup: 33

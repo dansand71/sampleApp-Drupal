@@ -63,11 +63,11 @@ echo "ClusterIP:${clusterip}"
     sleep 20
     fi
 done
+sed -i -e "s|REPLACENFSSERVERIP|${clusterip}|g" ./pv-drupal-nfs-client.yml
 #Mount jumpbox to the new NFS cluster point and copy the files
 echo "Create mount directory:/mnt/drupal"
-sudo mkdir -p /mnt/drupal
 echo "Unmount this directory if it already exists"
-sudo umount -l /mnt/drupal
+#sudo umount -l /mnt/drupal
 echo "Create mount point, make directories and copy files."
 #sudo mount -t cifs //REPLACEDRUPALSTORAGEACCOUNT.file.core.windows.net/drupal-sites /mnt/drupal-sites -o vers=3.0,username=REPLACEDRUPALSTORAGEACCOUNT,password=REPLACEDRUPALSTORAGEKEY,dir_mode=0777,file_mode=0777
 clusterip=`kubectl get services nfs -o json | jq --raw-output '.status.loadBalancer.ingress[0].ip'`
@@ -78,12 +78,11 @@ sudo mkdir -p /mnt/drupal/themes
 sudo mkdir -p /mnt/drupal/profiles
 #CHOWN to www-data
 sudo chown -R 33:33 /mnt/drupal/sites
-sudo chown -R 33:33 /mnt/drupal/sites
-sudo chown -R 33:33 /mnt/drupal/sites
-sudo chown -R 33:33 /mnt/drupal/sites
+sudo chown -R 33:33 /mnt/drupal/modules
+sudo chown -R 33:33 /mnt/drupal/themes
+sudo chown -R 33:33 /mnt/drupal/profiles
 
 sudo cp -r /source/AppDev-ContainerDemo/sample-apps/drupal/vm-assets/sites/. /mnt/drupal/sites/.
-#sudo umount /mnt/drupal
 echo "Create mysql and drupal deployments."
 kubectl create -f deploy-mysql.yml
 kubectl create -f deploy-drupal.yml

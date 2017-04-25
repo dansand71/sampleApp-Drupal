@@ -14,7 +14,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nfs-sites
+  name: nfs-themes
 spec:
   capacity:
     storage: 1Gi
@@ -22,5 +22,34 @@ spec:
     - ReadWriteMany
   nfs:
     # FIXME: use the right IP
-    server: 10.0.195.104
-    path: "/sites"
+    server: REPLACENFSSERVERIP
+    path: "/themes"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-modules
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    # FIXME: use the right IP
+    server: REPLACENFSSERVERIP
+    path: "/modules"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-profiles
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    # FIXME: use the right IP
+    server: REPLACENFSSERVERIP
+    path: "/profiles"
+
