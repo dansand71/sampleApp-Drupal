@@ -4,17 +4,17 @@ metadata:
   name: fast
 provisioner: kubernetes.io/azure-disk
 parameters:
-  skuName: Premium_LRS
+  skuName: Standard_LRS
 ---
 apiVersion: "v1"
 kind: "PersistentVolumeClaim"
 metadata:
   name: "mysql-pv"
   annotations:
-    volume.beta.kubernetes.io/storage-class: "fast"
+    volume.beta.kubernetes.io/storage-class: "slow"
 spec:
   accessModes:
     - "ReadWriteOnce"
   resources:
     requests:
-      storage: "10Gi"
+      storage: "5Gi"
