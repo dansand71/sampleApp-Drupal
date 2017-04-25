@@ -5,25 +5,10 @@ BOLD="\e[4m"
 YELLOW="\033[38;5;11m"
 RED="\033[0;31m"
 
-#az account set --subscription "Microsoft Azure Internal Consumption"
-echo ".delete existing drupal-deployment"
-kubectl delete deployment drupal-deployment
-kubectl delete pvc nfs-sites
-kubectl delete pvc nfs-profiles
-kubectl delete pvc nfs-modules
-kubectl delete pvc nfs-themes
-kubectl delete pv nfs-sites
-kubectl delete pv nfs-modules
-kubectl delete pv nfs-profiles
-kubectl delete pv nfs-themes
-
-#kubectl delete deployment mysqlsvc-deployment
-
-#kubectl delete deployment nfs-server
-#kubectl delete pvc nfs-server
-#kubectl delete pv nfs-server
-
-#
+echo ".delete existing mysql-deployment"
+kubectl delete deployment mysql-deployment
+echo ".delete existing nfs-server-deployment"
+kubectl delete deployment nfs-server-deployment
 
 if grep -Fq "REPLACEMYSQLPASSWORD" ./deploy-mysql.yml
 then
@@ -73,9 +58,15 @@ echo "For Example:   kubectl get services"
 echo " NAME         CLUSTER-IP     EXTERNAL-IP     PORT(S)                      AGE"
 echo " nfs          10.0.94.5      40.71.102.179   2049:30204/TCP               3h"
 echo " nfs-server   10.0.195.104   <none>          2049/TCP,20048/TCP,111/TCP   8h"
+echo " -----------------------------------------"
+echo "Current status:" 
 kubectl get services
+echo ""
+echo ""
 echo "........................................"
 echo "For Example:   kubectl get pods"
 echo " NAME                                     READY     STATUS    RESTARTS   AGE"
 echo " nfs-server-deployment-4254342066-x1bm7   1/1       Running   0          5h"
+echo " -----------------------------------------"
+echo "Current status:"
 kubectl get pods

@@ -6,10 +6,17 @@ YELLOW="\033[38;5;11m"
 RED="\033[0;31m"
 
 #az account set --subscription "Microsoft Azure Internal Consumption"
-echo ".delete existing mysql-deployment"
-kubectl delete deployment mysql-deployment
-echo ".delete existing nfs-server-deployment"
-kubectl delete deployment nfs-server-deployment
+echo ".delete existing drupal-deployment and volumes"
+kubectl delete deployment drupal-deployment
+kubectl delete pvc nfs-sites
+kubectl delete pvc nfs-profiles
+kubectl delete pvc nfs-modules
+kubectl delete pvc nfs-themes
+kubectl delete pv nfs-sites
+kubectl delete pv nfs-modules
+kubectl delete pv nfs-profiles
+kubectl delete pv nfs-themes
+
 
 nfsavailable=`kubectl get deployments nfs-server-deployment -o json | jq '.status.availableReplicas'`  #this should be 1
 if [[ @nfsavailable != 1]]; then
@@ -18,7 +25,7 @@ if [[ @nfsavailable != 1]]; then
     echo " NAME                    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE"
     echo " nfs-server-deployment   1         1         1            1           5h"
     echo ""
-    echo" -----------------------------------------"
+    echo " -----------------------------------------"
     echo "Current status:"
     kubectl get deployments nfs-server-deployment
     echo ".stopping script until this is resolved."
