@@ -67,7 +67,7 @@ echo ""
 echo "........................................"
 echo "For Example:   kubectl get pods"
 echo " NAME                                     READY     STATUS    RESTARTS   AGE"
-echo " nfs-server-deployment-4254342066-x1bm7   1/1       Running   0          5h"
+echo " nfs-server-deployment-BLAH-BLAH          1/1       Running   0          5h"
 echo " -----------------------------------------"
 echo "Current status:"
 kubectl get pods
