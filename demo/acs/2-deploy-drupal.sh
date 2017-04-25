@@ -19,7 +19,7 @@ kubectl delete pv nfs-themes
 
 
 nfsavailable=`kubectl get deployments nfs-server-deployment -o json | jq '.status.availableReplicas'`  #this should be 1
-if [[ @nfsavailable != 1]]; then
+if [[ $nfsavailable != 1 ]]; then
     echo "Could not determine if the NFS Server deployment was alive.  This script requires the server to be up to continue."
     echo "kubectl get deployments nfs-server-deployment SHOULD READ:"
     echo " NAME                    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE"
