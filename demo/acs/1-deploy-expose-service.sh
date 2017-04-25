@@ -11,11 +11,11 @@ kubectl delete deployment drupal-deployment
 kubectl delete pvc nfs-sites
 kubectl delete pv nfs-sites
 
-kubectl delete deployment mysqlsvc-deployment
+#kubectl delete deployment mysqlsvc-deployment
 
-kubectl delete deployment nfs-server
-kubectl delete pvc nfs-server
-kubectl delete pv nfs-server
+#kubectl delete deployment nfs-server
+#kubectl delete pvc nfs-server
+#kubectl delete pv nfs-server
 
 #
 
