@@ -25,45 +25,25 @@ kubectl delete pv nfs-themes
 
 #
 
-if grep -Fq "REPLACEMYSQLPASSWORD" ./deploy-mysql.yml
-then
-    echo ".Please enter new MYSQL root password:"
-    while true
-    do
-    read -s -p "$(echo -e -n "${INPUT}.New Admin Password for MYSQL:${RESET}")" mysqlPassword
+nfsavailable=`kubectl get deployments nfs-server-deployment -o json | jq '.status.availableReplicas'`  #this should be 1
+if [[ @nfsavailable != 1]]; then
+    echo "Could not determine if the NFS Server deployment was alive.  This script requires the server to be up to continue."
+    echo "kubectl get deployments nfs-server-deployment SHOULD READ:"
+    echo " NAME                    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE"
+    echo " nfs-server-deployment   1         1         1            1           5h"
     echo ""
-    read -s -p "$(echo -e -n "${INPUT}.Re-enter to verify:${RESET}")" mysqlPassword2
-    
-    if [ $mysqlPassword = $mysqlPassword2 ]
-    then
-        break 2
-    else
-        echo -e ".${RED}Passwords do not match.  Please retry. ${RESET}"
-    fi
-    done
-    sed -i -e "s|REPLACEMYSQLPASSWORD|${mysqlPassword}|g" ./deploy-mysql.yml
-else
-    echo ".mysql password already changed.  Skipping prompt for new password."
+    echo "Current status:"
+    kubectl get deployments nfs-server-deployment
+    echo ".stopping script until this is resolved."
 fi
-
-
-echo "-------------------------"
-echo "Deploy the Persistent Volume claims"
-kubectl create -f pv-nfs-server.yml
-echo ".deploy NFS Server PVC"
-kubectl create -f pv-mysql.yml
-echo ".deploy MYSQL Server PVC"
-sleep 5
+echo ".looks like nfs is alive.  Continuing on to get the internal ip of the cluster."
 internalip=`kubectl get services nfs -o json | jq --raw-output '.spec.clusterIP'`
 echo ".working on internal NFS Server IP Address - found internal NFS Server ip at: ${internalip}"
 sed -i -e "s|REPLACENFSSERVERIP|${internalip}|g" ./pv-drupal-nfs-client.yml
+echo ".creating the nfs client persistent volumes"
 kubectl create -f pv-drupal-nfs-client.yml
-echo ".deploy DRUPAL NFS Client PVC"
 echo "-------------------------"
-echo "Deploy the pods"
-kubectl create -f deploy-nfs-server.yml
-kubectl expose deployments nfs-server-deployment --port=2049 --target-port=2049 --type=LoadBalancer --name=nfs
-echo ".deployed nfs server - now wait until the clusterip is available"
+echo "Check for external IP.  An external IP is required so the jumpbox can attach and copy in the default files so install can continue."
 while true;
 do
 clusterip=`kubectl get services nfs -o json | jq --raw-output '.status.loadBalancer.ingress[0].ip'`
@@ -90,24 +70,24 @@ sudo mkdir -p /mnt/drupal/modules
 sudo mkdir -p /mnt/drupal/themes
 sudo mkdir -p /mnt/drupal/profiles
 #COPY
+".COPYING SOURCE FILES - into /mnt/drupal/sites"
 sudo cp -r /source/AppDev-ContainerDemo/sample-apps/drupal/vm-assets/sites/. /mnt/drupal/sites/.
 #CHOWN to www-data
+".changing ownership of source files so www-data can access the data."
 sudo chown -R 33:33 /mnt/drupal/sites
 sudo chown -R 33:33 /mnt/drupal/modules
 sudo chown -R 33:33 /mnt/drupal/themes
 sudo chown -R 33:33 /mnt/drupal/profiles
 
-echo "Create mysql and drupal deployments."
-kubectl create -f deploy-mysql.yml
+echo "Create drupal deployment."
 kubectl create -f deploy-drupal.yml
 echo "-------------------------"
 
 echo "Initial deployment & expose the service"
-kubectl expose deployments mysqlsvc-deployment --port=3306 --target-port=3306 --name=mysqlsvc
 kubectl expose deployments drupal-deployment --port=80 --target-port=80 --type=LoadBalancer --name=drupal
-#kubectl delete service nfs #cleanup so we dont leave the NFS server exposed
+kubectl delete service nfs #cleanup so we dont leave the NFS server exposed
 
-echo "Deployment complete for pods: nodejs-todo & nosqlsvc"
+echo "Deployment complete for drupal pods"
 
 echo ".kubectl get services"
 kubectl get services
