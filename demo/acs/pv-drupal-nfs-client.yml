@@ -1,15 +1,16 @@
-kind: PersistentVolume
 apiVersion: v1
+kind: PersistentVolume
 metadata:
   name: nfs-sites
-  labels:
 spec:
-  volumeName: nfs-sites
+  capacity:
+    storage: 1Gi
   accessModes:
     - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
+  nfs:
+    # FIXME: use the right IP
+    server: REPLACENFSSERVERIP
+    path: "/sites"
 ---
 apiVersion: v1
 kind: PersistentVolume
