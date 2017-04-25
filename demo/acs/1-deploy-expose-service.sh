@@ -76,6 +76,12 @@ sudo mkdir -p /mnt/drupal/sites
 sudo mkdir -p /mnt/drupal/modules
 sudo mkdir -p /mnt/drupal/themes
 sudo mkdir -p /mnt/drupal/profiles
+#CHOWN to www-data
+sudo chown -R 33:33 /mnt/drupal/sites
+sudo chown -R 33:33 /mnt/drupal/sites
+sudo chown -R 33:33 /mnt/drupal/sites
+sudo chown -R 33:33 /mnt/drupal/sites
+
 sudo cp -r /source/AppDev-ContainerDemo/sample-apps/drupal/vm-assets/sites/. /mnt/drupal/sites/.
 #sudo umount /mnt/drupal
 echo "Create mysql and drupal deployments."
@@ -98,4 +104,3 @@ kubectl get pods
 
 echo ".to bash into individual pods - kubectl exec -p <podname> -i -t -- bash -il"
 echo ".to check deployment status - kubectl describe po <podname>"
-echo "- next step is to bash into the pod and chown /var/www/html/sites to www-data"
