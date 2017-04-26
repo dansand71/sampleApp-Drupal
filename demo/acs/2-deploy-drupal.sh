@@ -31,7 +31,7 @@ if [[ $nfsavailable != 1 ]]; then
     echo ".stopping script until this is resolved."
 fi
 echo ".looks like nfs is alive.  Continuing on to get the internal ip of the cluster."
-internalip=`kubectl get services nfs -o json | jq --raw-output '.spec.clusterIP'`
+internalip=`kubectl get services nfs-server -o json | jq --raw-output '.spec.clusterIP'`
 echo ".working on internal NFS Server IP Address - found internal NFS Server ip at: ${internalip}"
 sed -i -e "s|REPLACENFSSERVERIP|${internalip}|g" ./pv-drupal-nfs-client.yml
 echo ".creating the nfs client persistent volumes"
@@ -53,27 +53,31 @@ echo "ClusterIP:${clusterip}"
 done
 #Mount jumpbox to the new NFS cluster point and copy the files
 echo "Create mount directory:/mnt/drupal"
-sudo mkdir -p ~/drupal
+sudo mkdir -p $HOME/drupal
 echo "Unmount this directory if it already exists"
-sudo umount -l ~/drupal
+sudo umount -l $HOME/drupal
 echo "Create mount point, make directories and copy files."
 #sudo mount -t cifs //REPLACEDRUPALSTORAGEACCOUNT.file.core.windows.net/drupal-sites /mnt/drupal-sites -o vers=3.0,username=REPLACEDRUPALSTORAGEACCOUNT,password=REPLACEDRUPALSTORAGEKEY,dir_mode=0777,file_mode=0777
 clusterip=`kubectl get services nfs -o json | jq --raw-output '.status.loadBalancer.ingress[0].ip'`
 echo ".found public nfs endpoint at ${clusterip}"
 sudo mount -t nfs ${clusterip}:/ ~/drupal
-sudo mkdir -p ~/drupal/sites
-sudo mkdir -p ~/drupal/modules
-sudo mkdir -p ~/drupal/themes
-sudo mkdir -p ~/drupal/profiles
+sudo mkdir -p $HOME/drupal/sites
+sudo mkdir -p $HOME/drupal/modules
+sudo mkdir -p $HOME/drupal/themes
+sudo mkdir -p $HOME/drupal/profiles
 #COPY
 ".COPYING SOURCE FILES - into /mnt/drupal/sites"
-sudo cp -r /source/AppDev-ContainerDemo/sample-apps/drupal/vm-assets/sites/. ~/drupal/sites/.
+sudo cp -r /source/AppDev-ContainerDemo/sample-apps/drupal/vm-assets/sites/. $HOME/drupal/sites/.
 #CHOWN to www-data
 ".changing ownership of source files so www-data can access the data."
-sudo chown -R 33:33 ~/drupal/sites
-sudo chown -R 33:33 ~/drupal/modules
-sudo chown -R 33:33 ~/drupal/themes
-sudo chown -R 33:33 ~/drupal/profiles
+sudo chown -R 33:33 $HOME/drupal/sites
+sudo chown -R 33:33 $HOME/drupal/modules
+sudo chown -R 33:33 $HOME/drupal/themes
+sudo chown -R 33:33 $HOME/drupal/profiles
+
+echo "Unmount the drupal copy directory"
+sudo umount -l $HOME/drupal
+sudo rm -rf $HOME/drupal
 
 echo "Create drupal deployment."
 kubectl create -f deploy-drupal.yml
